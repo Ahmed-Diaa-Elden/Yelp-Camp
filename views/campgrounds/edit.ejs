@@ -1,0 +1,53 @@
+    <% layout('layouts/poilerblate') %> 
+    <div class="row">
+        <h1 class="text-center">New Campground</h1>
+        <div class="col-6 offset-3">
+            <form action="/campgrounds/<%= camp._id %>?_method=PUT" method="POST" novalidate class="validated-form">
+                <div class="mb-3">
+                    <label class="form-label" for="title">Title</label>
+                    <input class="form-control" type="text" id="title" name="campgrounds[title]" value="<%= camp.title %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="location">Location</label>
+                    <input class="form-control" type="text" id="location" name="campgrounds[location]" value="<%= camp.location %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="image">Image Url</label>
+                    <input class="form-control" type="text" id="image" name="campgrounds[image]" value="<%= camp.image %>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="price">Campground Price</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input class="form-control" aria-label="Amount (to the nearest dollar)" type="number" step="0.01" id="price" name="campgrounds[price]" placeholder="0.00" value="<%= camp.price %>" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-control" type="text" id="description" name="campgrounds[description]" required><%= camp.description %></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div>
+                <button class="mb-3 btn btn-info">Save</button>
+            </form>
+            <footer class="mb-3">
+                <a href="/campgrounds/<%= camp._id %>" class="btn btn-outline-warning">Back to Campground</a>
+            </footer>
+        </div>
+    </div>
+
+
+    
