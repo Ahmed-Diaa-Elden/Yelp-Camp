@@ -1,6 +1,6 @@
     <% layout('layouts/poilerblate') %> 
     <div class="row mb-3">
-        <div class="col-6 offset-3">
+        <div class="col-md-6 mb-3">
             <div class="card">
                 <img src="<%= camp.image %>" class="card-img-top" alt="...">
                 <div class="card-body">
@@ -20,9 +20,38 @@
                 </div>
                 <div class="card-footer text-muted">
                     2 days ago
-                  </div>
+                </div>
               </div>
-        </div>
+            </div>
+            <!-- reviews -->
+            <div class="col-md-6">
+            <form action="/campgrounds/<%= camp._id %>/reviews" method="POST" class="mb-3 validated-form" novalidate>
+              <h2>Leave a Review</h2>
+              <div class="mb-3">
+                <label for="customRange2" class="form-label">Rating</label>
+                <input type="range" name="review[rating]" class="form-range" value="0" min="1" max="5" id="customRange2">
+              </div>
+              <div class="mb-3 form-floating">
+                <textarea required name="review[body]" class="form-control" style="height: 100px" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+                <label for="floatingTextarea">Review</label>
+                <div class="valid-feedback">
+                  Looks good!
+                </div>
+              </div>
+              <button class="btn btn-success" type="submit">Submit Review</button>
+            </form>
+            <% for(let review of camp.reviews){ %> 
+              <div class="mb-3 card">
+                <div class="card-body">
+                  <h5 class="card-title">Rating: <%= review.rating %></h5>
+                  <p class="card-text">Review: <%= review.body %></p>
+                  <form action="/campgrounds/<%= camp._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST">
+                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                  </form>
+                </div>
+              </div>
+            <% } %> 
+          </div>
     </div>
 
 
