@@ -1,20 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const catchAsync = require('../utils/catchAsync')
-const ExpressError = require('../utils/ExpressError')
 const Campground = require('../models/campground');
-const {campgroundSchema} = require('../schemas');
-const {isLoggedIn} = require('../middleware');
+const {isLoggedIn,isAuthor,validateCampground} = require('../middleware');
 
-const validateCampground = (req,res,next)=>{
-    const {error} = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el=> el.message).join(',');
-        next(new ExpressError(msg,400))
-    } else{
-        next();
-    }
-}
+
+
 
 router.get('/',catchAsync(async (req,res)=>{
     const campgrounds = await Campground.find();// please don't forget (await) as it take time to deal with database
@@ -25,7 +16,16 @@ router.get('/new', isLoggedIn,(req,res)=>{ // this get should be before the next
 })
 router.get('/:id', catchAsync(async (req,res)=>{
     const id = req.params.id; // same as --> const {id} = req.params;
-    const camp = await Campground.findById(id).populate('reviews');
+    // const camp = await Campground.findById(id).populate('reviews').populate('author'); 
+    // I will show you how to make nested populte
+    const camp = await Campground.findById(id).populate({
+        path: 'reviews',
+        populate:{
+            path:'author' // Sothat we can display the review's author username
+        }
+    }).populate('author'); 
+
+    // console.log(camp)
     if(!camp) {
         req.flash('error','This campground is not exist')
         res.redirect('/campgrounds');
@@ -37,11 +37,12 @@ router.post('/', isLoggedIn,validateCampground,catchAsync(async (req,res)=>{
     const campgrounds = req.body.campgrounds; // Don't forget that to get the req.body elements we need to parse the body first and the same for JSON
     // console.log(campgrounds)
     const newCamp = new Campground(campgrounds)
+    newCamp.author = req.user._id;
     await newCamp.save();
     req.flash('success','Sucessfully made a new campground!')
     res.redirect(`/campgrounds/${newCamp._id}`);
 }))
-router.get('/:id/edit', isLoggedIn,catchAsync(async (req,res)=>{
+router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(async (req,res)=>{
     const {id} = req.params;
     const camp = await Campground.findById(id);
     if(!camp) {
@@ -50,14 +51,14 @@ router.get('/:id/edit', isLoggedIn,catchAsync(async (req,res)=>{
     }
     res.render('campgrounds/edit',{camp});
 }))
-router.put('/:id', isLoggedIn,validateCampground,catchAsync(async (req,res)=>{
+router.put('/:id', isLoggedIn, isAuthor, validateCampground, catchAsync(async (req,res)=>{
     const campgrounds = req.body.campgrounds; // Don't forget that to get the req.body elements we need to parse the body first and the same for JSON
     const {id} = req.params;
     const editedCamp = await Campground.findByIdAndUpdate(id,campgrounds,{new:true,runValidators:true}); // if you want to spread the object you can do this {...campgrounds} instead of --> campgrounds and they both are the same
     req.flash('success','Sucessfully updated campground!')
     res.redirect(`/campgrounds/${editedCamp._id}`);
 }))
-router.delete('/:id', isLoggedIn,catchAsync(async (req,res)=>{
+router.delete('/:id', isLoggedIn, isAuthor, catchAsync(async (req,res)=>{
     const {id} = req.params;
     await Campground.findByIdAndDelete(id);
     req.flash('success','Sucessfully deleted campground!')

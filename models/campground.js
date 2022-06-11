@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Review = require('./review');
+const user = require('./user');
 const Schema = mongoose.Schema;
 
 const campgroundSchema = new Schema({
@@ -8,6 +9,10 @@ const campgroundSchema = new Schema({
     price:Number,
     description:String,
     location:String,
+    author:{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     reviews:[{type:Schema.Types.ObjectId,ref:'Review'}]
 })
 
