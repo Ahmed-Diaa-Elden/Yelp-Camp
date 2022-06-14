@@ -1,4 +1,5 @@
 const Campground = require('../models/campground');
+const {cloudinary} = require('../cloudinary/index')
 
 
 module.exports.index = async (req,res)=>{
@@ -15,8 +16,10 @@ module.exports.createCampground = async (req,res)=>{
     const camp = req.body.campgrounds; // Don't forget that to get the req.body elements we need to parse the body first and the same for JSON
     // console.log(campground)
     const newCamp = new Campground(camp);
+    newCamp.images = req.files.map(f => ({url: f.path,filename: f.filename}));
     newCamp.author = req.user._id;
     await newCamp.save();
+    // console.log(newCamp);
     req.flash('success','Sucessfully made a new campground!')
     res.redirect(`/campgrounds/${newCamp._id}`);
 };
@@ -52,8 +55,18 @@ module.exports.renderEditForm = async (req,res)=>{
 
 module.exports.updateCampground = async (req,res)=>{
     const camp = req.body.campgrounds; // Don't forget that to get the req.body elements we need to parse the body first and the same for JSON
+    // console.log(req.body)
     const {id} = req.params;
     const editedCamp = await Campground.findByIdAndUpdate(id,camp,{new:true,runValidators:true}); // if you want to spread the object you can do this {...camp} instead of --> campgrounds and they both are the same
+    const imgs = req.files.map(f => ({url: f.path,filename: f.filename}));
+    editedCamp.images.push(...imgs);
+    await editedCamp.save();
+    if(req.body.deleteImages){
+        for(let filename of req.body.deleteImages){
+            await cloudinary.uploader.destroy(filename);
+        }
+        await editedCamp.updateOne({$pull:{images:{filename:{$in:req.body.deleteImages}}}});
+    }
     req.flash('success','Sucessfully updated campground!')
     res.redirect(`/campgrounds/${editedCamp._id}`);
 };

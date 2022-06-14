@@ -1,12 +1,20 @@
     <% layout('layouts/boilerplate') %> 
     <h1>All Campgrounds</h1>
-    <a href="/campgrounds/new">Add New Campground</a>
+    <!-- <a href="/campgrounds/new">Add New Campground</a> -->
 
     <% for(let camp of campgrounds){%>
         <div class="card mb-3">
             <div class="row">
                 <div class="col-md-4">
-                    <img src="<%= camp.image %>" class="img-fluid" alt="...">
+                    <div id="campgroundCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                                <% camp.images.forEach((img,i)=>{ %> 
+                            <div class="carousel-item <%= i===0 ?'active':'' %>">
+                                <img src="<%= img.url %>" class="d-block w-100" alt="">
+                            </div>
+                            <% }) %> 
+                        </div>
+                    </div>                    
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">

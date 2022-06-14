@@ -2,7 +2,7 @@
     <div class="row">
         <h1 class="text-center">New Campground</h1>
         <div class="col-6 offset-3">
-            <form action="/campgrounds" method="post" novalidate class="validated-form">
+            <form action="/campgrounds" method="post" novalidate class="validated-form" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label" for="title">Title</label>
                     <input class="form-control" type="text" id="title" name="campgrounds[title]" required>
@@ -15,13 +15,6 @@
                     <input class="form-control" type="text" id="location" name="campgrounds[location]" required>
                     <div class="valid-feedback">
                         Looks good!
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="image">Image Url</label>
-                    <input class="form-control" type="text" id="image" name="campgrounds[image]" required>
-                    <div class="invalid-feedback">
-                        Please choose an image url.
                     </div>
                 </div>
                 <div class="mb-3">
@@ -41,7 +34,18 @@
                         Please insert a brief description.
                     </div>
                 </div>
-                <button class="mb-3 btn btn-success">Add Campground</button>
+                <div class="mb-3">
+                    <!-- <label for="images" class="form-label">Upload Images</label> -->
+                    <input class="form-control" type="file" id="images" name="image" multiple>
+                </div>
+                <!-- <div class="mb-3">
+                    <label class="form-label" for="image">Image Url</label>
+                    <input class="form-control" type="text" id="image" name="campgrounds[image]" required>
+                    <div class="invalid-feedback">
+                        Please choose an image url.
+                    </div>
+                </div> -->
+                <button class="mb-3 btn btn-success" id="addCampground">Add Campground</button>
             </form>
             <footer class="mb-3">
                 <a href="/campgrounds" class="btn btn-outline-warning">All Campgrounds</a>
@@ -49,3 +53,28 @@
         </div>
     </div>
 
+<script>
+    const input = document.querySelector('#images');
+    // const addCampground = document.querySelector('#addCampground');
+
+// Listen for files selection
+input.addEventListener('change', (e) => {
+    // Retrieve all files
+    const files = input.files;
+
+    // Check files count
+    if (files.length > 5) {
+        alert(`Only 5 files are allowed to upload.`);
+        return;
+    }
+    // TODO: continue uploading on server
+});
+
+// this is a try of preventing from submitting till number of photos less than 5
+// addCampground.addEventListener('submit', (e) => {
+//     if(input.files.length>5) {
+//         e.preventDefault
+//         alert(`Only 5 files are allowed to upload.`);
+//     }
+// });
+</script>

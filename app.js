@@ -1,3 +1,8 @@
+if(process.env.NODE_ENV !== 'production') { // we are in development enviroment by default not production enviroment
+    require('dotenv').config();
+} // if we are using github or uploading this code somewhere we shoud ignore '.env' file
+// console.log(process.env.CLOUDINARY_SECRET,process.env.CLOUDINARY_KEY,process.env.CLOUDINARY_CLOUD_NAME); // to make sure that we read .env file successfully
+
 const express = require('express');
 const app = express();
 const path = require('path');

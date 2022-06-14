@@ -3,9 +3,24 @@ const Review = require('./review');
 const user = require('./user');
 const Schema = mongoose.Schema;
 
+function imagesArrayLimit(val){
+    return val.length <= 5;
+}
+
+
+const imageSchema = new Schema({
+    url:String,
+    filename:String
+})
+imageSchema.virtual('thumbnail').get(function() {
+    return this.url.replace('/upload','/upload/w_200');
+})
 const campgroundSchema = new Schema({
     title:String,
-    image:String,
+    images:{
+        type:[imageSchema],
+        validate:[imagesArrayLimit,'You can max upload 5 images']
+        },
     price:Number,
     description:String,
     location:String,
@@ -15,6 +30,7 @@ const campgroundSchema = new Schema({
     },
     reviews:[{type:Schema.Types.ObjectId,ref:'Review'}]
 })
+
 
 campgroundSchema.post('findOneAndDelete',async (doc)=>{
     if(doc){
