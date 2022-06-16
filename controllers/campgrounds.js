@@ -1,5 +1,8 @@
 const Campground = require('../models/campground');
 const {cloudinary} = require('../cloudinary/index')
+const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const mapBoxToken = process.env.MAPBOX_TOKEN;
+const geocoder = mbxGeocoding({accessToken:mapBoxToken});
 
 
 module.exports.index = async (req,res)=>{
@@ -12,14 +15,19 @@ module.exports.renderNewForm = (req,res)=>{ // this get should be before the nex
 };
 
 module.exports.createCampground = async (req,res)=>{
+    const geoData = await geocoder.forwardGeocode({
+        query: req.body.campgrounds.location,
+        limit: 1
+    }).send()
     // if (!req.body.campgrounds) next(new ExpressError('Invalid Campground Data',400)) // ملهاش لزوم أوي لأن ده بتمنع اللي هيبعت الداتا من خلال برنامج بوست مان إنما أنا عامل قيود على الموقع لو هيبعت منه
     const camp = req.body.campgrounds; // Don't forget that to get the req.body elements we need to parse the body first and the same for JSON
     // console.log(campground)
     const newCamp = new Campground(camp);
+    newCamp.geometry = geoData.body.features[0].geometry;
     newCamp.images = req.files.map(f => ({url: f.path,filename: f.filename}));
     newCamp.author = req.user._id;
     await newCamp.save();
-    // console.log(newCamp);
+    console.log(newCamp);
     req.flash('success','Sucessfully made a new campground!')
     res.redirect(`/campgrounds/${newCamp._id}`);
 };
@@ -55,10 +63,15 @@ module.exports.renderEditForm = async (req,res)=>{
 
 module.exports.updateCampground = async (req,res)=>{
     const camp = req.body.campgrounds; // Don't forget that to get the req.body elements we need to parse the body first and the same for JSON
+    const geoData = await geocoder.forwardGeocode({
+        query: req.body.campgrounds.location,
+        limit: 1
+    }).send()
     // console.log(req.body)
     const {id} = req.params;
     const editedCamp = await Campground.findByIdAndUpdate(id,camp,{new:true,runValidators:true}); // if you want to spread the object you can do this {...camp} instead of --> campgrounds and they both are the same
     const imgs = req.files.map(f => ({url: f.path,filename: f.filename}));
+    editedCamp.geometry = geoData.body.features[0].geometry;
     editedCamp.images.push(...imgs);
     await editedCamp.save();
     if(req.body.deleteImages){
