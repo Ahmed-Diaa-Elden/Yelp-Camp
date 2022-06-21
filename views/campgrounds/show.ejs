@@ -2,7 +2,6 @@
     <link rel="stylesheet" href="/css/starability-heartbeat.min.css">
     <div class="row mb-3">
         <div class="col-md-6 mb-3">
-          <div id='map' style='width: 100%; height: 300px;'></div>
           <div class="card">
             
             <div id="campgroundCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -49,7 +48,8 @@
             </div>
             <!-- reviews -->
             <div class="col-md-6">
-              <h2>Reviews</h2>
+              <div id='map' style='width: 100%; height: 300px;'></div>
+              <h3>Reviews</h3>
               <% if(currentUser){ %> 
             <form action="/campgrounds/<%= camp._id %>/reviews" method="POST" class="mb-3 validated-form" novalidate>
               <!-- <div class="mb-3">
@@ -101,7 +101,7 @@
 
 
     <script>
-      const mapBox_Token = '<%= process.env.MAPBOX_TOKEN %>'
+      const mapBoxToken = '<%= process.env.MAPBOX_TOKEN %>'
       const camp = <%- JSON.stringify(camp) %>;
       // console.log(camp)
     </script>
