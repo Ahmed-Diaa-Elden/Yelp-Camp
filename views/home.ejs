@@ -4,12 +4,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <title>YelpCamp</title>
 </head>
 
 <body>
-    <h1>HOME! YELP CAMP!</h1>
-
+    <div class="bg-dark h-100 text-center d-flex flex-column project">
+        <div class="container cont-Home d-flex flex-column justify-content-between">
+            <header>
+                <nav class="navbar sticky-top navbar-expand-lg navbar-dark ">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="/">YelpCamp</a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav ms-auto">
+                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                            <a class="nav-link" href="/campgrounds">Campgrounds</a>
+                            <% if(!currentUser){ %> 
+                            <a class="nav-link" href="/login">Login</a>
+                            <a class="nav-link" href="/register">Register</a>
+                            <% } else{ %> 
+                            <a class="nav-link" href="/logout">Logout</a>
+                            <% } %> 
+                        </div>
+                        </div>
+                    </div>
+                </nav>                
+            </header>
+            <main class="d-flex justify-content-center align-items-center">
+                <div>
+                    <h1 class="text-white">YelpCamp</h1>
+                    <p class="lead text-white">Welcom to YelpCamp! <br> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Debitis deserunt quis amet assumenda sint ad iste suscipit incidunt unde asperiores expedita earum dolorem consequatur error maiores rerum blanditiis, voluptatum dignissimos.</p>
+                    <a class="btn btn-lg btn-secondary fw-bold bg-white" href="/campgrounds" role="button">Campgrounds</a>
+                </div>
+            </main>
+            <footer class="footer py-3">
+                <div class="container">
+                    <span class="text-muted">&copy; YelpCamp 2022</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
