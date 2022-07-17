@@ -17,20 +17,22 @@ const {campgroundSchema,reviewSchema} = require('./schemas');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
 const session = require('express-session');
-const { date } = require('joi');
+const { date, func } = require('joi');
 const flash = require('connect-flash');
 const User = require('./models/user');
 const passport = require('passport'); // allows us to plug in multiple strategies for authentication
 const LocalStrategy = require('passport-local');
 const userRoutes = require('./routes/users');
 const mongoSanitize = require('express-mongo-sanitize');
-const helmet = require('helmet');
+const MongoStore = require('connect-mongo');
+// const helmet = require('helmet');
+const dbUrl =  'mongodb://localhost:27017/yelp-camp';
 
 
 main().catch(err => console.log(err));
-
+// mongodb://localhost:27017/yelp-camp
 async function main() {
-    await mongoose.connect('mongodb://localhost:27017/yelp-camp')
+    await mongoose.connect(dbUrl)
     .then(()=>{
         console.log('Connected to MongoDB')
     })
@@ -45,19 +47,28 @@ app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(mongoSanitize());
 
+const secret = process.env.SESSION_SECRET || 'thisshouldbeabettersecret!'
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    secret,
+    touchAfter: 24 * 60 * 60
+})
 const sessionConfig = {
     name: '_bh2', // instead of default connect.sid to make it harder for hacker which cookie is he looking for
-    secret: 'thisshouldbeabettersecret!',
+    secret,
     resave: false,
     saveUninitialized: true,
-    //store:,
+    store,
     cookie: {
         httpOnly: true, // For security purposes
         // secure: true, // set cookies to work only on https websites --> for notation localhost is not in https
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,     // in mSec
-        maxAge: 1000 * 60 * 60 * 24 * 7
+        maxAge: 1000 * 60 * 60 * 24 * 7 // If both Expires and Max-Age are set, Max-Age has precedence.
     }
 }
+store.on('error', function(e){
+    console.log('Session store error',e)
+})
 app.use(session(sessionConfig));
 app.use(flash());
 
@@ -73,7 +84,7 @@ passport.deserializeUser(User.deserializeUser()); // How to get user out of that
 
 app.use((req,res,next)=>{
     // console.log(req.session);
-    // console.log(req.query) // now when you add this example to our website link '?$lol=200' no values will be stored in req.query
+    // console.log(req.query) // now when you add this example to our website link '?$lol=200' no values will be stored in req.query because of mongoSanitize
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
@@ -106,6 +117,7 @@ app.use((err,req,res,next)=>{
     res.status(statusCode).render('error',{err});
 })
 
-app.listen(3000,()=>{
-    console.log('Connected to port: 3000 Successfully');
+const port = process.env.PORT || 3000;
+app.listen(port,()=>{
+    console.log(`Connected to port: ${port} Successfully`);
 })
